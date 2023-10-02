@@ -56,22 +56,20 @@ class SearchFlowViewModel: ObservableObject {
     
     func fetchVendor(with query: String) {
         if !query.isEmpty {
-            Task.init {
-                await networkService.searchForVendors(with: query)
-                    .receive(on: DispatchQueue.main) // Ensure updates happen on the main thread
-                    .sink(receiveCompletion: { [weak self] completion in
-                        switch completion {
-                        case .failure(let error):
-                            print(error)
-                        case .finished:
-                            break
-                        }
-                    }) { [weak self] vendorResponse in
-                        DispatchQueue.main.async { [weak self] in
-                            self?.vendors = vendorResponse.vendors.map { VendorCellViewModel(vendor: $0) }
-                        }
-                    }.store(in: &disposable)
-            }
+            networkService.searchForVendors(with: query)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        print(error)
+                    case .finished:
+                        break
+                    }
+                }) { [weak self] vendorResponse in
+                    DispatchQueue.main.async { [weak self] in
+                        self?.vendors = vendorResponse.vendors.map { VendorCellViewModel(vendor: $0) }
+                    }
+                }.store(in: &disposable)
         } else {
             Task.init {
                 await getVendors()

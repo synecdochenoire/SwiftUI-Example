@@ -10,7 +10,7 @@ import Combine
 
 protocol NetworkingServiceProtocol {
     func getVendors() async -> Result<VendorResponse, NetworkingError>
-    func searchForVendors(with query: String) async -> AnyPublisher<VendorResponse, NetworkingError>
+    func searchForVendors(with query: String) -> AnyPublisher<VendorResponse, NetworkingError>
 }
 
 final class NetworkService: NetworkingServiceProtocol {
@@ -28,7 +28,7 @@ final class NetworkService: NetworkingServiceProtocol {
         }
     }
     
-    func searchForVendors(with query: String) async -> AnyPublisher<VendorResponse, NetworkingError> {
+    func searchForVendors(with query: String) -> AnyPublisher<VendorResponse, NetworkingError> {
         guard let url = Bundle.main.url(forResource: "vendors", withExtension: "json") else {
             return Fail(error: NetworkingError.parsing(message: "Failed to get url"))
                 .eraseToAnyPublisher()
